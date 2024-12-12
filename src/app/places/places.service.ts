@@ -50,10 +50,17 @@ export class PlacesService {
     const prevPlaces = this.userPlaces();
 
     if (prevPlaces.some((p) => p.id === place.id)) {
-      this.userPlaces.update(prevPlaces.filter(p => p.id !== place.id));
+      this.userPlaces.set(prevPlaces.filter(p => p.id !== place.id));
     }
 
-    return this.httpClient.delete('http://localhost:3000/user-places')
+    return this.httpClient.delete('http://localhost:3000/user-places/' + place.id);
+    pipe(
+      catchError(error => {
+        this.userPlaces.set(prevPlaces);
+        this.errorService.showError('failed to store selected place')
+        return throwError(() => new Error('failed to store selected place'))
+      })
+    );
   }
 
   private fetchPlaces(url: string, errorMessage: string) {
