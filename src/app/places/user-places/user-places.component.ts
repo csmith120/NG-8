@@ -12,36 +12,38 @@ import { PlacesService } from '../places.service';
   styleUrl: './user-places.component.css',
   imports: [PlacesContainerComponent, PlacesComponent],
 })
-export class UserPlacesComponent implements OnInit{
+
+export class UserPlacesComponent implements OnInit {
   isFetching = signal(false)
   error = signal('');
   private placesService = inject(PlacesService);
-  private destoryRef = inject(DestroyRef);
-  places = this.placesService.loadUserPlaces;
+  private destroyRef = inject(DestroyRef)
+  places = this.placesService.loadedUserPlaces;
 
   ngOnInit() {
-    this.isFetching.set(true);
+    this.isFetching .set(true);
+
     const subscription = this.placesService.loadUserPlaces()
     .subscribe({
-      error: (error:Error) => {
+
+      error: (error:Error) =>{
         this.error.set(error.message);
       },
+
       complete: () => {
-        this.isFetching.set(false);
+        this.isFetching.set(false)
       }
     });
 
-    this.destoryRef.onDestroy(() => {
-      subscription.unsubscribe();
-    });
-  }
-
-  onRemovePlace(place: Place) {
-    const subscription = this.placesService.removeUserPlace(place).subscribe();
-
-    this.destoryRef.onDestroy(() => {
+    this.destroyRef.onDestroy(() => {
       subscription.unsubscribe();
     })
   }
 
+  onRemovePlace(place: Place) {
+    const subscription = this.placesService.removeUserPlace(place).subscribe();
+    this.destroyRef.onDestroy(() => {
+      subscription.unsubscribe();
+    })
+  }
 }
